@@ -311,7 +311,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
       // If the next token is not '<', we have a qualified-id that refers
       // to a template name, such as T::template apply, but is not a
       // template-id.
-      if (Tok.isNot(tok::less)) {
+      if (Tok.isNot(tok::templateintro)) {
         TPA.Revert();
         break;
       }
@@ -478,7 +478,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
 
     // nested-name-specifier:
     //   type-name '<'
-    if (Next.is(tok::less)) {
+    if (Next.is(tok::templateintro)) {
       TemplateTy Template;
       UnqualifiedId TemplateName;
       TemplateName.setIdentifier(&II, Tok.getLocation());
@@ -576,7 +576,8 @@ ExprResult Parser::tryParseCXXIdExpression(CXXScopeSpec &SS, bool isAddressOfOpe
       getCurScope(), SS, TemplateKWLoc, Name, Tok.is(tok::l_paren),
       isAddressOfOperand, /*CCC=*/nullptr, /*IsInlineAsmIdentifier=*/false,
       &Replacement);
-  if (!E.isInvalid() && !E.isUnset() && Tok.is(tok::less))
+  if (!E.isInvalid() && !E.isUnset() &&
+			Tok.is(tok::templateintro))
     checkPotentialAngleBracket(E);
   return E;
 }
@@ -1218,7 +1219,7 @@ ExprResult Parser::ParseLambdaExpressionAfterIntroducer(
   };
 
   // FIXME: Consider allowing this as an extension for GCC compatibiblity.
-  const bool HasExplicitTemplateParams = Tok.is(tok::less);
+  const bool HasExplicitTemplateParams = Tok.is(tok::templateintro);
   ParseScope TemplateParamScope(this, Scope::TemplateParamScope,
                                 /*EnteredScope=*/HasExplicitTemplateParams);
   if (HasExplicitTemplateParams) {
@@ -1697,7 +1698,7 @@ Parser::ParseCXXPseudoDestructor(Expr *Base, SourceLocation OpLoc,
 
   // If there is a '<', the second type name is a template-id. Parse
   // it as such.
-  if (Tok.is(tok::less) &&
+  if ((Tok.is(tok::templateintro)) &&
       ParseUnqualifiedIdTemplateId(SS, SourceLocation(),
                                    Name, NameLoc,
                                    false, ObjectType, SecondTypeName,
@@ -2213,7 +2214,8 @@ bool Parser::ParseUnqualifiedIdTemplateId(CXXScopeSpec &SS,
                                           ParsedType ObjectType,
                                           UnqualifiedId &Id,
                                           bool AssumeTemplateId) {
-  assert(Tok.is(tok::less) && "Expected '<' to finish parsing a template-id");
+		assert((Tok.is(tok::templateintro))
+					 && "Expected '<' to finish parsing a template-id");
 
   TemplateTy Template;
   TemplateNameKind TNK = TNK_Non_template;
@@ -2693,7 +2695,7 @@ bool Parser::ParseUnqualifiedId(CXXScopeSpec &SS, bool EnteringContext,
 
     // If the next token is a '<', we may have a template.
     TemplateTy Template;
-    if (Tok.is(tok::less))
+    if (Tok.is(tok::templateintro))
       return ParseUnqualifiedIdTemplateId(
           SS, TemplateKWLoc ? *TemplateKWLoc : SourceLocation(), Id, IdLoc,
           EnteringContext, ObjectType, Result, TemplateSpecified);
@@ -2771,7 +2773,7 @@ bool Parser::ParseUnqualifiedId(CXXScopeSpec &SS, bool EnteringContext,
     TemplateTy Template;
     if ((Result.getKind() == UnqualifiedIdKind::IK_OperatorFunctionId ||
          Result.getKind() == UnqualifiedIdKind::IK_LiteralOperatorId) &&
-        Tok.is(tok::less))
+        (Tok.is(tok::templateintro)))
       return ParseUnqualifiedIdTemplateId(
           SS, TemplateKWLoc ? *TemplateKWLoc : SourceLocation(), nullptr,
           SourceLocation(), EnteringContext, ObjectType, Result,
@@ -2849,7 +2851,7 @@ bool Parser::ParseUnqualifiedId(CXXScopeSpec &SS, bool EnteringContext,
     IdentifierInfo *ClassName = Tok.getIdentifierInfo();
     SourceLocation ClassNameLoc = ConsumeToken();
 
-    if (Tok.is(tok::less)) {
+    if ((Tok.is(tok::templateintro))) {
       Result.setDestructorName(TildeLoc, nullptr, ClassNameLoc);
       return ParseUnqualifiedIdTemplateId(
           SS, TemplateKWLoc ? *TemplateKWLoc : SourceLocation(), ClassName,

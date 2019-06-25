@@ -3569,7 +3569,10 @@ LexNextToken:
     if (getCharAndSize(CurPtr, SizeTmp) == '=') {
       Kind = tok::exclaimequal;
       CurPtr = ConsumeChar(CurPtr, SizeTmp, Result);
-    } else {
+    } else if (getCharAndSize(CurPtr, SizeTmp) == '(') {
+			Kind = tok::templateintro;
+			CurPtr = ConsumeChar(CurPtr, SizeTmp, Result);
+		} else {
       Kind = tok::exclaim;
     }
     break;

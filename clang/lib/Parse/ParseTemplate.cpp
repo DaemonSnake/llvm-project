@@ -943,7 +943,7 @@ Parser::ParseTemplateIdAfterTemplateName(bool ConsumeLastToken,
                                          SourceLocation &LAngleLoc,
                                          TemplateArgList &TemplateArgs,
                                          SourceLocation &RAngleLoc) {
-  assert(Tok.is(tok::less) && "Must have already parsed the template-name");
+	assert((Tok.is(tok::templateintro)) && "Must have already parsed the template-name");
 
   // Consume the '<'.
   LAngleLoc = ConsumeToken();
@@ -1014,7 +1014,7 @@ bool Parser::AnnotateTemplateIdToken(TemplateTy Template, TemplateNameKind TNK,
                                      UnqualifiedId &TemplateName,
                                      bool AllowTypeAnnotation) {
   assert(getLangOpts().CPlusPlus && "Can only annotate template-ids in C++");
-  assert(Template && Tok.is(tok::less) &&
+  assert(Template && (Tok.is(tok::templateintro)) &&
          "Parser isn't at the beginning of a template-id");
 
   // Consume the template-name.
