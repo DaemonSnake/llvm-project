@@ -947,7 +947,7 @@ ExprResult Parser::ParseCastExpression(bool isUnaryExpression,
       }
 
       if ((!ColonIsSacred && Next.is(tok::colon)) ||
-          Next.isOneOf(tok::coloncolon, tok::less, tok::l_paren,
+          Next.isOneOf(tok::period, tok::less, tok::l_paren,
                        tok::l_brace)) {
         // If TryAnnotateTypeOrScopeToken annotates the token, tail recurse.
         if (TryAnnotateTypeOrScopeToken())
@@ -1370,12 +1370,12 @@ ExprResult Parser::ParseCastExpression(bool isUnaryExpression,
     Res = ParseCXXIdExpression(isAddressOfOperand);
     break;
 
-  case tok::coloncolon: {
+  case tok::period: {
     // ::foo::bar -> global qualified name etc.   If TryAnnotateTypeOrScopeToken
     // annotates the token, tail recurse.
     if (TryAnnotateTypeOrScopeToken())
       return ExprError();
-    if (!Tok.is(tok::coloncolon))
+    if (!Tok.is(tok::period))
       return ParseCastExpression(isUnaryExpression, isAddressOfOperand);
 
     // ::new -> [C++] new-expression

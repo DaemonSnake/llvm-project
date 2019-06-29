@@ -1211,7 +1211,7 @@ static StringRef getFallthroughAttrSpelling(Preprocessor &PP,
 
   TokenValue ClangFallthroughTokens[] = {
     tok::l_square, tok::l_square, PP.getIdentifierInfo("clang"),
-    tok::coloncolon, PP.getIdentifierInfo("fallthrough"),
+    tok::period, PP.getIdentifierInfo("fallthrough"),
     tok::r_square, tok::r_square
   };
 

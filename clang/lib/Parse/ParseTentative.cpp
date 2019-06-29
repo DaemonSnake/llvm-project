@@ -202,7 +202,7 @@ Parser::TPResult Parser::TryConsumeDeclarationSpecifier() {
       }
     }
 
-    if (Tok.isOneOf(tok::identifier, tok::coloncolon, tok::kw_decltype,
+    if (Tok.isOneOf(tok::identifier, tok::period, tok::kw_decltype,
                     tok::annot_template_id) &&
         TryAnnotateCXXScopeToken())
       return TPResult::Error;
@@ -742,7 +742,7 @@ Parser::isCXX11AttributeSpecifier(bool Disambiguate,
       IsAttribute = false;
       break;
     }
-    if (Tok.is(tok::coloncolon)) {
+    if (Tok.is(tok::period)) {
       ConsumeToken();
       if (!TryParseCXX11AttributeIdentifier(Loc)) {
         IsAttribute = false;
@@ -785,7 +785,7 @@ Parser::isCXX11AttributeSpecifier(bool Disambiguate,
 
 Parser::TPResult Parser::TryParsePtrOperatorSeq() {
   while (true) {
-    if (Tok.isOneOf(tok::coloncolon, tok::identifier))
+    if (Tok.isOneOf(tok::period, tok::identifier))
       if (TryAnnotateCXXScopeToken(true))
         return TPResult::Error;
 
@@ -1324,7 +1324,7 @@ Parser::isCXXDeclarationSpecifier(Parser::TPResult BracedCastResult,
     if (!getLangOpts().ObjC && Next.is(tok::identifier))
       return TPResult::True;
 
-    if (Next.isNot(tok::coloncolon) && Next.isNot(tok::less)) {
+    if (Next.isNot(tok::period) && Next.isNot(tok::less)) {
       // Determine whether this is a valid expression. If not, we will hit
       // a parse error one way or another. In that case, tell the caller that
       // this is ambiguous. Typo-correct to type and expression keywords and
@@ -1382,7 +1382,7 @@ Parser::isCXXDeclarationSpecifier(Parser::TPResult BracedCastResult,
       return TPResult::Error;
     return isCXXDeclarationSpecifier(BracedCastResult, InvalidAsDeclSpec);
 
-  case tok::coloncolon: {    // ::foo::bar
+  case tok::period: {    // ::foo::bar
     const Token &Next = NextToken();
     if (Next.isOneOf(tok::kw_new,       // ::new
                      tok::kw_delete))   // ::delete

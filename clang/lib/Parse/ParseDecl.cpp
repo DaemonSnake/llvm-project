@@ -1831,7 +1831,7 @@ bool Parser::MightBeDeclarator(DeclaratorContext Context) {
   case tok::annot_template_id:
   case tok::caret:
   case tok::code_completion:
-  case tok::coloncolon:
+  case tok::period:
   case tok::ellipsis:
   case tok::kw___attribute:
   case tok::kw_operator:
@@ -1854,7 +1854,7 @@ bool Parser::MightBeDeclarator(DeclaratorContext Context) {
   case tok::identifier:
     switch (NextToken().getKind()) {
     case tok::code_completion:
-    case tok::coloncolon:
+    case tok::period:
     case tok::comma:
     case tok::equal:
     case tok::equalequal: // Might be a typo for '='.
@@ -2859,7 +2859,7 @@ Parser::DiagnoseMissingSemiAfterTagDefinition(DeclSpec &DS, AccessSpecifier AS,
                           DSContext == DeclSpecContext::DSC_top_level);
 
   if (getLangOpts().CPlusPlus &&
-      Tok.isOneOf(tok::identifier, tok::coloncolon, tok::kw_decltype,
+      Tok.isOneOf(tok::identifier, tok::period, tok::kw_decltype,
                   tok::annot_template_id) &&
       TryAnnotateCXXScopeToken(EnteringContext)) {
     SkipMalformedDecl();
@@ -2889,7 +2889,7 @@ Parser::DiagnoseMissingSemiAfterTagDefinition(DeclSpec &DS, AccessSpecifier AS,
     // These tokens cannot come after the declarator-id in a
     // simple-declaration, and are likely to come after a type-specifier.
     if (Next.isOneOf(tok::star, tok::amp, tok::ampamp, tok::identifier,
-                     tok::annot_cxxscope, tok::coloncolon)) {
+                     tok::annot_cxxscope, tok::period)) {
       // Missing a semicolon.
       MightBeDeclarator = false;
     } else if (HasScope) {
@@ -3100,14 +3100,14 @@ void Parser::ParseDeclarationSpecifiers(DeclSpec &DS,
       return cutOffParsing();
     }
 
-    case tok::coloncolon: // ::foo::bar
+    case tok::period: // ::foo::bar
       // C++ scope specifier.  Annotate and loop, or bail out on error.
       if (TryAnnotateCXXScopeToken(EnteringContext)) {
         if (!DS.hasTypeSpecifier())
           DS.SetTypeSpecError();
         goto DoneWithDeclSpec;
       }
-      if (Tok.is(tok::coloncolon)) // ::new or ::delete
+      if (Tok.is(tok::period)) // ::new or ::delete
         goto DoneWithDeclSpec;
       continue;
 
@@ -4790,7 +4790,7 @@ bool Parser::isTypeSpecifierQualifier() {
       return false;
     return isTypeSpecifierQualifier();
 
-  case tok::coloncolon:   // ::foo::bar
+  case tok::period:   // ::foo::bar
     if (NextToken().is(tok::kw_new) ||    // ::new
         NextToken().is(tok::kw_delete))   // ::delete
       return false;
@@ -4938,7 +4938,7 @@ bool Parser::isDeclarationSpecifier(bool DisambiguatingWithExpression) {
 
     return isDeclarationSpecifier();
 
-  case tok::coloncolon:   // ::foo::bar
+  case tok::period:   // ::foo::bar
     if (NextToken().is(tok::kw_new) ||    // ::new
         NextToken().is(tok::kw_delete))   // ::delete
       return false;
@@ -5178,7 +5178,7 @@ bool Parser::isConstructorDeclarator(bool IsUnqualified, bool DeductionGuide) {
     case tok::l_square:
       // C(X   [   5]);
       // C(X   [   [attribute]]);
-    case tok::coloncolon:
+    case tok::period:
       // C(X   ::   Y);
       // C(X   ::   *p);
       // Assume this isn't a constructor, rather than assuming it's a
@@ -5468,9 +5468,9 @@ void Parser::ParseDeclaratorInternal(Declarator &D,
   // Member pointers get special handling, since there's no place for the
   // scope spec in the generic path below.
   if (getLangOpts().CPlusPlus &&
-      (Tok.is(tok::coloncolon) || Tok.is(tok::kw_decltype) ||
+      (Tok.is(tok::period) || Tok.is(tok::kw_decltype) ||
        (Tok.is(tok::identifier) &&
-        (NextToken().is(tok::coloncolon) || NextToken().is(tok::less))) ||
+        (NextToken().is(tok::period) || NextToken().is(tok::less))) ||
        Tok.is(tok::annot_cxxscope))) {
     bool EnteringContext =
         D.getContext() == DeclaratorContext::FileContext ||

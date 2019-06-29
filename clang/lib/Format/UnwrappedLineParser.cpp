@@ -1438,7 +1438,7 @@ bool UnwrappedLineParser::tryToParseLambda() {
     case tok::greater:
     case tok::identifier:
     case tok::numeric_constant:
-    case tok::coloncolon:
+    case tok::period:
     case tok::kw_mutable:
     case tok::kw_noexcept:
       nextToken();
@@ -1872,7 +1872,7 @@ void UnwrappedLineParser::parseNamespace() {
   if (InitialToken.is(TT_NamespaceMacro)) {
     parseParens();
   } else {
-    while (FormatTok->isOneOf(tok::identifier, tok::coloncolon))
+    while (FormatTok->isOneOf(tok::identifier, tok::period))
       nextToken();
   }
   if (FormatTok->Tok.is(tok::l_brace)) {
@@ -2050,7 +2050,7 @@ bool UnwrappedLineParser::parseEnum() {
     nextToken();
 
   while (FormatTok->Tok.getIdentifierInfo() ||
-         FormatTok->isOneOf(tok::colon, tok::coloncolon, tok::less,
+         FormatTok->isOneOf(tok::colon, tok::period, tok::less,
                             tok::greater, tok::comma, tok::question)) {
     nextToken();
     // We can have macros or attributes in between 'enum' and the enum name.
@@ -2164,7 +2164,7 @@ void UnwrappedLineParser::parseRecord(bool ParseAsExpr) {
 
   // The actual identifier can be a nested name specifier, and in macros
   // it is often token-pasted.
-  while (FormatTok->isOneOf(tok::identifier, tok::coloncolon, tok::hashhash,
+  while (FormatTok->isOneOf(tok::identifier, tok::period, tok::hashhash,
                             tok::kw___attribute, tok::kw___declspec,
                             tok::kw_alignas) ||
          ((Style.Language == FormatStyle::LK_Java ||

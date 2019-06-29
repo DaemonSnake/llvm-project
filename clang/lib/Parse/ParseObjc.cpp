@@ -1158,7 +1158,7 @@ void Parser::ParseObjCTypeQualifierList(ObjCDeclSpec &DS,
     for (unsigned i = 0; i != objc_NumQuals; ++i) {
       if (II != ObjCTypeQuals[i] ||
           NextToken().is(tok::less) ||
-          NextToken().is(tok::coloncolon))
+          NextToken().is(tok::period))
         continue;
 
       ObjCDeclSpec::ObjCDeclQualifier Qual;
@@ -2897,7 +2897,7 @@ ExprResult Parser::ParseObjCAtExpression(SourceLocation AtLoc) {
 bool Parser::ParseObjCXXMessageReceiver(bool &IsExpr, void *&TypeOrExpr) {
   InMessageExpressionRAIIObject InMessage(*this, true);
 
-  if (Tok.isOneOf(tok::identifier, tok::coloncolon, tok::kw_typename,
+  if (Tok.isOneOf(tok::identifier, tok::period, tok::kw_typename,
                   tok::annot_cxxscope))
     TryAnnotateTypeOrScopeToken();
 
@@ -3588,7 +3588,7 @@ ExprResult Parser::ParseObjCSelectorExpression(SourceLocation AtLoc) {
 
   IdentifierInfo *SelIdent = ParseObjCSelectorPiece(sLoc);
   if (!SelIdent &&  // missing selector name.
-      Tok.isNot(tok::colon) && Tok.isNot(tok::coloncolon))
+      Tok.isNot(tok::colon) && Tok.isNot(tok::period))
     return ExprError(Diag(Tok, diag::err_expected) << tok::identifier);
 
   KeyIdents.push_back(SelIdent);
@@ -3596,7 +3596,7 @@ ExprResult Parser::ParseObjCSelectorExpression(SourceLocation AtLoc) {
   unsigned nColons = 0;
   if (Tok.isNot(tok::r_paren)) {
     while (1) {
-      if (TryConsumeToken(tok::coloncolon)) { // Handle :: in C++.
+      if (TryConsumeToken(tok::period)) { // Handle :: in C++.
         ++nColons;
         KeyIdents.push_back(nullptr);
       } else if (ExpectAndConsume(tok::colon)) // Otherwise expect ':'.
@@ -3616,7 +3616,7 @@ ExprResult Parser::ParseObjCSelectorExpression(SourceLocation AtLoc) {
       SourceLocation Loc;
       SelIdent = ParseObjCSelectorPiece(Loc);
       KeyIdents.push_back(SelIdent);
-      if (!SelIdent && Tok.isNot(tok::colon) && Tok.isNot(tok::coloncolon))
+      if (!SelIdent && Tok.isNot(tok::colon) && Tok.isNot(tok::period))
         break;
     }
   }

@@ -92,7 +92,7 @@ std::string computeUsingDeclarationLabel(const FormatToken *UsingTok) {
     Label.append("typename ");
     Tok = Tok->Next;
   }
-  if (Tok && Tok->is(tok::coloncolon)) {
+  if (Tok && Tok->is(tok::period)) {
     Label.append("::");
     Tok = Tok->Next;
   }
@@ -101,7 +101,7 @@ std::string computeUsingDeclarationLabel(const FormatToken *UsingTok) {
     HasIdentifier = true;
     Label.append(Tok->TokenText.str());
     Tok = Tok->Next;
-    if (!Tok || Tok->isNot(tok::coloncolon))
+    if (!Tok || Tok->isNot(tok::period))
       break;
     Label.append("::");
     Tok = Tok->Next;

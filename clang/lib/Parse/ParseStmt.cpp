@@ -182,7 +182,7 @@ Retry:
 
     // Look up the identifier, and typo-correct it to a keyword if it's not
     // found.
-    if (Next.isNot(tok::coloncolon)) {
+    if (Next.isNot(tok::period)) {
       // Try to limit which sets of keywords should be included in typo
       // correction based on what the next token is.
       StatementFilterCCC CCC(Next);
@@ -726,7 +726,7 @@ StmtResult Parser::ParseCaseStatement(ParsedStmtContext StmtCtx,
 
     if (TryConsumeToken(tok::colon, ColonLoc)) {
     } else if (TryConsumeToken(tok::semi, ColonLoc) ||
-               TryConsumeToken(tok::coloncolon, ColonLoc)) {
+               TryConsumeToken(tok::period, ColonLoc)) {
       // Treat "case blah;" or "case blah::" as a typo for "case blah:".
       Diag(ColonLoc, diag::err_expected_after)
           << "'case'" << tok::colon

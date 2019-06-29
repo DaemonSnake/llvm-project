@@ -599,7 +599,7 @@ bool Parser::ParseTopLevelDecl(DeclGroupPtrTy &Result, bool IsFirstDecl) {
     case tok::identifier: {
       IdentifierInfo *II = NextToken().getIdentifierInfo();
       if ((II == Ident_module || II == Ident_import) &&
-          GetLookAheadToken(2).isNot(tok::coloncolon)) {
+          GetLookAheadToken(2).isNot(tok::period)) {
         if (II == Ident_module)
           goto module_decl;
         else
@@ -664,7 +664,7 @@ bool Parser::ParseTopLevelDecl(DeclGroupPtrTy &Result, bool IsFirstDecl) {
     //   is never interpreted as the declaration of a top-level-declaration.
     if ((Tok.getIdentifierInfo() == Ident_module ||
          Tok.getIdentifierInfo() == Ident_import) &&
-        NextToken().isNot(tok::coloncolon)) {
+        NextToken().isNot(tok::period)) {
       if (Tok.getIdentifierInfo() == Ident_module)
         goto module_decl;
       else
@@ -1747,7 +1747,7 @@ bool Parser::TryKeywordIdentFallback(bool DisableKeyword) {
 /// Note that this routine emits an error if you call it with ::new or ::delete
 /// as the current tokens, so only call it in contexts where these are invalid.
 bool Parser::TryAnnotateTypeOrScopeToken() {
-  assert((Tok.is(tok::identifier) || Tok.is(tok::coloncolon) ||
+  assert((Tok.is(tok::identifier) || Tok.is(tok::period) ||
           Tok.is(tok::kw_typename) || Tok.is(tok::annot_cxxscope) ||
           Tok.is(tok::kw_decltype) || Tok.is(tok::annot_template_id) ||
           Tok.is(tok::kw___super)) &&
@@ -1978,8 +1978,8 @@ bool Parser::TryAnnotateTypeOrScopeTokenAfterScopeSpec(CXXScopeSpec &SS,
 bool Parser::TryAnnotateCXXScopeToken(bool EnteringContext) {
   assert(getLangOpts().CPlusPlus &&
          "Call sites of this function should be guarded by checking for C++");
-  assert((Tok.is(tok::identifier) || Tok.is(tok::coloncolon) ||
-          (Tok.is(tok::annot_template_id) && NextToken().is(tok::coloncolon)) ||
+  assert((Tok.is(tok::identifier) || Tok.is(tok::period) ||
+          (Tok.is(tok::annot_template_id) && NextToken().is(tok::period)) ||
           Tok.is(tok::kw_decltype) || Tok.is(tok::kw___super)) &&
          "Cannot be a type or scope token!");
 

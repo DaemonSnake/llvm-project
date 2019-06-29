@@ -1150,7 +1150,7 @@ static bool isEndOfTemplateArgument(Token Tok) {
 
 /// Parse a C++ template template argument.
 ParsedTemplateArgument Parser::ParseTemplateTemplateArgument() {
-  if (!Tok.is(tok::identifier) && !Tok.is(tok::coloncolon) &&
+  if (!Tok.is(tok::identifier) && !Tok.is(tok::period) &&
       !Tok.is(tok::annot_cxxscope))
     return ParsedTemplateArgument();
 

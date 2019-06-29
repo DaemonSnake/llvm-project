@@ -800,7 +800,7 @@ bool Parser::ConsumeAndStoreFunctionPrologue(CachedTokens &Toks) {
     }
     do {
       // Walk over a component of a nested-name-specifier.
-      if (Tok.is(tok::coloncolon)) {
+      if (Tok.is(tok::period)) {
         Toks.push_back(Tok);
         ConsumeToken();
 
@@ -816,12 +816,12 @@ bool Parser::ConsumeAndStoreFunctionPrologue(CachedTokens &Toks) {
       } else {
         break;
       }
-    } while (Tok.is(tok::coloncolon));
+    } while (Tok.is(tok::period));
 
     if (Tok.is(tok::code_completion)) {
       Toks.push_back(Tok);
       ConsumeCodeCompletionToken();
-      if (Tok.isOneOf(tok::identifier, tok::coloncolon, tok::kw_decltype)) {
+      if (Tok.isOneOf(tok::identifier, tok::period, tok::kw_decltype)) {
         // Could be the start of another member initializer (the ',' has not
         // been written yet)
         continue;

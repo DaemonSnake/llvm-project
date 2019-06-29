@@ -759,9 +759,9 @@ StmtResult Parser::ParseAsmStatement(bool &msAsm) {
 
   // Parse Outputs, if present.
   bool AteExtraColon = false;
-  if (Tok.is(tok::colon) || Tok.is(tok::coloncolon)) {
+  if (Tok.is(tok::colon) || Tok.is(tok::period)) {
     // In C++ mode, parse "::" like ": :".
-    AteExtraColon = Tok.is(tok::coloncolon);
+    AteExtraColon = Tok.is(tok::period);
     ConsumeToken();
 
     if (!AteExtraColon && isGotoAsm && Tok.isNot(tok::colon)) {
@@ -777,12 +777,12 @@ StmtResult Parser::ParseAsmStatement(bool &msAsm) {
   unsigned NumOutputs = Names.size();
 
   // Parse Inputs, if present.
-  if (AteExtraColon || Tok.is(tok::colon) || Tok.is(tok::coloncolon)) {
+  if (AteExtraColon || Tok.is(tok::colon) || Tok.is(tok::period)) {
     // In C++ mode, parse "::" like ": :".
     if (AteExtraColon)
       AteExtraColon = false;
     else {
-      AteExtraColon = Tok.is(tok::coloncolon);
+      AteExtraColon = Tok.is(tok::period);
       ConsumeToken();
     }
 
@@ -796,11 +796,11 @@ StmtResult Parser::ParseAsmStatement(bool &msAsm) {
   unsigned NumInputs = Names.size() - NumOutputs;
 
   // Parse the clobbers, if present.
-  if (AteExtraColon || Tok.is(tok::colon) || Tok.is(tok::coloncolon)) {
+  if (AteExtraColon || Tok.is(tok::colon) || Tok.is(tok::period)) {
     if (AteExtraColon)
       AteExtraColon = false;
     else {
-      AteExtraColon = Tok.is(tok::coloncolon);
+      AteExtraColon = Tok.is(tok::period);
       ConsumeToken();
     }
     // Parse the asm-string list for clobbers if present.

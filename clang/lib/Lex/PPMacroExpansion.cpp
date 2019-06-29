@@ -1662,7 +1662,7 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
           // It is possible to receive a scope token.  Read the "::", if it is
           // available, and the subsequent identifier.
           LexUnexpandedToken(Tok);
-          if (Tok.isNot(tok::coloncolon))
+          if (Tok.isNot(tok::period))
             HasLexedNextToken = true;
           else {
             ScopeII = II;

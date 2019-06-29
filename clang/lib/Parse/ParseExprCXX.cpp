@@ -62,7 +62,7 @@ static void FixDigraph(Parser &P, Preprocessor &PP, Token &DigraphToken,
       << FixItHint::CreateReplacement(Range, "< ::");
 
   // Update token information to reflect their change in token type.
-  ColonToken.setKind(tok::coloncolon);
+  ColonToken.setKind(tok::period);
   ColonToken.setLocation(ColonToken.getLocation().getLocWithOffset(-1));
   ColonToken.setLength(2);
   DigraphToken.setKind(tok::less);
@@ -182,7 +182,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
 
   bool HasScopeSpecifier = false;
 
-  if (Tok.is(tok::coloncolon)) {
+  if (Tok.is(tok::period)) {
     // ::new and ::delete aren't nested-name-specifiers.
     tok::TokenKind NextKind = NextToken().getKind();
     if (NextKind == tok::kw_new || NextKind == tok::kw_delete)
@@ -203,7 +203,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
 
   if (Tok.is(tok::kw___super)) {
     SourceLocation SuperLoc = ConsumeToken();
-    if (!Tok.is(tok::coloncolon)) {
+    if (!Tok.is(tok::period)) {
       Diag(Tok.getLocation(), diag::err_expected_coloncolon_after_super);
       return true;
     }
@@ -221,7 +221,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
     // Work around a standard defect: 'decltype(auto)::' is not a
     // nested-name-specifier.
     if (DS.getTypeSpecType() == DeclSpec::TST_decltype_auto ||
-        !TryConsumeToken(tok::coloncolon, CCLoc)) {
+        !TryConsumeToken(tok::period, CCLoc)) {
       AnnotateExistingDecltypeSpecifier(DS, DeclLoc, EndLoc);
       return false;
     }
@@ -331,7 +331,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
       continue;
     }
 
-    if (Tok.is(tok::annot_template_id) && NextToken().is(tok::coloncolon)) {
+    if (Tok.is(tok::annot_template_id) && NextToken().is(tok::period)) {
       // We have
       //
       //   template-id '::'
@@ -351,7 +351,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
       // Consume the template-id token.
       ConsumeAnnotationToken();
 
-      assert(Tok.is(tok::coloncolon) && "NextToken() not working properly!");
+      assert(Tok.is(tok::period) && "NextToken() not working properly!");
       SourceLocation CCLoc = ConsumeToken();
 
       HasScopeSpecifier = true;
@@ -405,11 +405,11 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
         Diag(Next, diag::err_unexpected_colon_in_nested_name_spec)
           << FixItHint::CreateReplacement(Next.getLocation(), "::");
         // Recover as if the user wrote '::'.
-        Next.setKind(tok::coloncolon);
+        Next.setKind(tok::period);
       }
     }
 
-    if (Next.is(tok::coloncolon) && GetLookAheadToken(2).is(tok::l_brace)) {
+    if (Next.is(tok::period) && GetLookAheadToken(2).is(tok::l_brace)) {
       // It is invalid to have :: {, consume the scope qualifier and pretend
       // like we never saw it.
       Token Identifier = Tok; // Stash away the identifier.
@@ -420,7 +420,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
       Next = NextToken();         // Point Next at the '{' token.
     }
 
-    if (Next.is(tok::coloncolon)) {
+    if (Next.is(tok::period)) {
       if (CheckForDestructor && GetLookAheadToken(2).is(tok::tilde) &&
           !Actions.isNonTypeNestedNameSpecifier(getCurScope(), SS, IdInfo)) {
         *MayBePseudoDestructor = true;
@@ -449,7 +449,7 @@ bool Parser::ParseOptionalCXXScopeSpecifier(CXXScopeSpec &SS,
       // as the name in a nested-name-specifier.
       Token Identifier = Tok;
       SourceLocation IdLoc = ConsumeToken();
-      assert(Tok.isOneOf(tok::coloncolon, tok::colon) &&
+      assert(Tok.isOneOf(tok::period, tok::colon) &&
              "NextToken() not working properly!");
       Token ColonColon = Tok;
       SourceLocation CCLoc = ConsumeToken();
@@ -1657,7 +1657,7 @@ Parser::ParseCXXPseudoDestructor(Expr *Base, SourceLocation OpLoc,
   if (Tok.is(tok::identifier)) {
     FirstTypeName.setIdentifier(Tok.getIdentifierInfo(), Tok.getLocation());
     ConsumeToken();
-    assert(Tok.is(tok::coloncolon) &&"ParseOptionalCXXScopeSpecifier fail");
+    assert(Tok.is(tok::period) &&"ParseOptionalCXXScopeSpecifier fail");
     CCLoc = ConsumeToken();
   } else if (Tok.is(tok::annot_template_id)) {
     // FIXME: retrieve TemplateKWLoc from template-id annotation and
@@ -1665,7 +1665,7 @@ Parser::ParseCXXPseudoDestructor(Expr *Base, SourceLocation OpLoc,
     FirstTypeName.setTemplateId(
                               (TemplateIdAnnotation *)Tok.getAnnotationValue());
     ConsumeAnnotationToken();
-    assert(Tok.is(tok::coloncolon) &&"ParseOptionalCXXScopeSpecifier fail");
+    assert(Tok.is(tok::period) &&"ParseOptionalCXXScopeSpecifier fail");
     CCLoc = ConsumeToken();
   } else {
     FirstTypeName.setIdentifier(nullptr, SourceLocation());
@@ -2055,7 +2055,7 @@ void Parser::ParseCXXSimpleTypeSpecifier(DeclSpec &DS) {
 
   switch (Tok.getKind()) {
   case tok::identifier:   // foo::bar
-  case tok::coloncolon:   // ::foo::bar
+  case tok::period:   // ::foo::bar
     llvm_unreachable("Annotation token should already be formed!");
   default:
     llvm_unreachable("Not a simple-type-specifier token!");
@@ -2815,7 +2815,7 @@ bool Parser::ParseUnqualifiedId(CXXScopeSpec &SS, bool EnteringContext,
 
     // If the user wrote ~T::T, correct it to T::~T.
     DeclaratorScopeObj DeclScopeObj(*this, SS);
-    if (!TemplateSpecified && NextToken().is(tok::coloncolon)) {
+    if (!TemplateSpecified && NextToken().is(tok::period)) {
       // Don't let ParseOptionalCXXScopeSpecifier() "correct"
       // `int A; struct { ~A::A(); };` to `int A; struct { ~A:A(); };`,
       // it will confuse this recovery logic.
@@ -2829,7 +2829,7 @@ bool Parser::ParseUnqualifiedId(CXXScopeSpec &SS, bool EnteringContext,
         return true;
       if (SS.isNotEmpty())
         ObjectType = nullptr;
-      if (Tok.isNot(tok::identifier) || NextToken().is(tok::coloncolon) ||
+      if (Tok.isNot(tok::identifier) || NextToken().is(tok::period) ||
           !SS.isSet()) {
         Diag(TildeLoc, diag::err_destructor_tilde_scope);
         return true;

@@ -3796,7 +3796,7 @@ LexNextToken:
     } else if ((LangOpts.CPlusPlus ||
                 LangOpts.DoubleSquareBracketAttributes) &&
                Char == ':') {
-      Kind = tok::coloncolon;
+      Kind = tok::period;
       CurPtr = ConsumeChar(CurPtr, SizeTmp, Result);
     } else {
       Kind = tok::colon;

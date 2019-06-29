@@ -474,7 +474,7 @@ bool ContinuationIndenter::mustBreak(const LineState &State) {
 
   // If the return type spans multiple lines, wrap before the function name.
   if ((Current.is(TT_FunctionDeclarationName) ||
-       (Current.is(tok::kw_operator) && !Previous.is(tok::coloncolon))) &&
+       (Current.is(tok::kw_operator) && !Previous.is(tok::period))) &&
       !Previous.is(tok::kw_template) && State.Stack.back().BreakBeforeParameter)
     return true;
 
@@ -1041,7 +1041,7 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
     return State.Stack.back().Indent;
 
   if (NextNonComment->isOneOf(TT_StartOfName, TT_PointerOrReference) ||
-      Previous.isOneOf(tok::coloncolon, tok::equal, TT_JsTypeColon))
+      Previous.isOneOf(tok::period, tok::equal, TT_JsTypeColon))
     return ContinuationIndent;
   if (PreviousNonComment && PreviousNonComment->is(tok::colon) &&
       PreviousNonComment->isOneOf(TT_ObjCMethodExpr, TT_DictLiteral))

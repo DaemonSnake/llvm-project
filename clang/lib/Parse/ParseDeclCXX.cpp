@@ -87,7 +87,7 @@ Parser::DeclGroupPtrTy Parser::ParseNamespace(DeclaratorContext Context,
   if (Tok.is(tok::identifier)) {
     Ident = Tok.getIdentifierInfo();
     IdentLoc = ConsumeToken();  // eat the identifier.
-    while (Tok.is(tok::coloncolon) &&
+    while (Tok.is(tok::period) &&
            (NextToken().is(tok::identifier) ||
             (NextToken().is(tok::kw_inline) &&
              GetLookAheadToken(2).is(tok::identifier)))) {
@@ -1259,7 +1259,7 @@ bool Parser::isValidAfterTypeSpecifier(bool CouldBeBitfield) {
   case tok::ampamp:             // struct foo {...} &&        R = ...
   case tok::identifier:         // struct foo {...} V         ;
   case tok::r_paren:            //(struct foo {...} )         {4}
-  case tok::coloncolon:         // struct foo {...} ::        a::b;
+  case tok::period:         // struct foo {...} ::        a::b;
   case tok::annot_cxxscope:     // struct foo {...} a::       b;
   case tok::annot_typename:     // struct foo {...} a         ::b;
   case tok::annot_template_id:  // struct foo {...} a<int>    ::b;
@@ -2477,7 +2477,7 @@ Parser::ParseCXXClassMemberDeclaration(AccessSpecifier AS,
   // Access declarations.
   bool MalformedTypeSpec = false;
   if (!TemplateInfo.Kind &&
-      Tok.isOneOf(tok::identifier, tok::coloncolon, tok::kw___super)) {
+      Tok.isOneOf(tok::identifier, tok::period, tok::kw___super)) {
     if (TryAnnotateCXXScopeToken())
       MalformedTypeSpec = true;
 
@@ -3439,7 +3439,7 @@ void Parser::ParseConstructorInitializer(Decl *ConstructorDecl) {
     // If the previous initializer was valid and the next token looks like a
     // base or member initializer, assume that we're just missing a comma.
     else if (!MemInit.isInvalid() &&
-             Tok.isOneOf(tok::identifier, tok::coloncolon)) {
+             Tok.isOneOf(tok::identifier, tok::period)) {
       SourceLocation Loc = PP.getLocForEndOfToken(PrevTokLocation);
       Diag(Loc, diag::err_ctor_init_missing_comma)
         << FixItHint::CreateInsertion(Loc, ", ");
@@ -4074,7 +4074,7 @@ void Parser::ParseCXX11AttributeSpecifier(ParsedAttributes &attrs,
       break;
 
     // scoped attribute
-    if (TryConsumeToken(tok::coloncolon)) {
+    if (TryConsumeToken(tok::period)) {
       ScopeName = AttrName;
       ScopeLoc = AttrLoc;
 

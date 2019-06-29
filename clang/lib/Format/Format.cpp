@@ -1290,7 +1290,7 @@ private:
         return true;
       for (FormatToken *Tok = Line->First->Next; Tok; Tok = Tok->Next) {
         if (Tok->WhitespaceRange.getBegin() == Tok->WhitespaceRange.getEnd()) {
-          if (Tok->is(tok::coloncolon) && Tok->Previous->is(TT_TemplateOpener))
+          if (Tok->is(tok::period) && Tok->Previous->is(TT_TemplateOpener))
             return true;
           if (Tok->is(TT_TemplateCloser) &&
               Tok->Previous->is(TT_TemplateCloser))
