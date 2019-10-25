@@ -19,7 +19,7 @@
 /// ParseBinaryExpression.
 ///
 //===----------------------------------------------------------------------===//
-
+#include <iostream>
 #include "clang/Parse/Parser.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/Basic/PrettyStackTrace.h"
@@ -1610,6 +1610,38 @@ Parser::ParsePostfixExpressionSuffix(ExprResult LHS) {
       // Match the ']'.
       T.consumeClose();
       break;
+    }
+
+    case tok::ellipsis: {
+        if (NextToken().is(tok::l_square))
+        {
+            auto ellipsisLoc = ConsumeToken();
+            BalancedDelimiterTracker T(*this, tok::l_square);
+
+            if (T.consumeOpen()) {
+                Diag(Tok, diag::err_expected) << tok::l_paren;
+                SkipMalformedDecl();
+                break;
+            }
+
+            EnterExpressionEvaluationContext ConstantEvaluated(
+                Actions, Sema::ExpressionEvaluationContext::ConstantEvaluated);
+            ExprResult IndexExpr(ParseConstantExpressionInExprEvalContext());
+            if (IndexExpr.isInvalid()) {
+                SkipMalformedDecl();
+                break;
+            }
+
+            T.consumeClose();
+
+            Expr* OrigLHS = !LHS.isInvalid() ? LHS.get() : nullptr;
+            Expr* OrigIndex = !IndexExpr.isInvalid() ? IndexExpr.get() : nullptr;
+
+            Actions.ActOnPackIndexExpansion(OrigLHS, ellipsisLoc, OrigIndex);
+            std::cout << "hello here" << std::endl;
+            break;
+        }
+        LLVM_FALLTHROUGH;
     }
 
     case tok::l_paren:         // p-e: p-e '(' argument-expression-list[opt] ')'

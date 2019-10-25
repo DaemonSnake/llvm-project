@@ -603,6 +603,11 @@ QualType Sema::CheckPackExpansion(QualType Pattern, SourceRange PatternRange,
   return Context.getPackExpansionType(Pattern, NumExpansions);
 }
 
+ExprResult Sema::ActOnPackIndexExpansion(Expr *Pattern, SourceLocation EllipsisLoc, Expr *Index) {
+  auto pack = CheckPackExpansion(Pattern, EllipsisLoc, None);
+  return pack;
+}
+
 ExprResult Sema::ActOnPackExpansion(Expr *Pattern, SourceLocation EllipsisLoc) {
   return CheckPackExpansion(Pattern, EllipsisLoc, None);
 }

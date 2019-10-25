@@ -7054,6 +7054,8 @@ public:
   /// \param EllipsisLoc The location of the ellipsis.
   ExprResult ActOnPackExpansion(Expr *Pattern, SourceLocation EllipsisLoc);
 
+  ExprResult ActOnPackIndexExpansion(Expr *Pattern, SourceLocation EllipsisLoc, Expr *Index);
+
   /// Invoked when parsing an expression followed by an ellipsis, which
   /// creates a pack expansion.
   ///
