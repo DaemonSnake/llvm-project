@@ -1,0 +1,1 @@
+cmake -G Ninja ../llvm -DBUILD_SHARED_LIBS=true -DLLVM_CCACHE_BUILD=true -DLLVM_USE_LINKER=gold -DLLVM_ENABLE_PROJECTS='clang;libcxx;libcxxabi;libundwind;compiler-rt;clang-tools'
